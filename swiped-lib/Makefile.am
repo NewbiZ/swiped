@@ -70,13 +70,13 @@ libswiped_la_LDFLAGS = \
 	-version-info $(LTVER)
 
 libswiped_la_CPPFLAGS = \
-	${libglfw_CPPFLAGS}
+	${glfw3_CPPFLAGS}
 
 libswiped_la_CFLAGS = \
-	${libglfw_CFLAGS}
+	${glfw3_CFLAGS}
 
 libswiped_la_LIBADD = \
-	${libglfw_LIBS}
+	${glfw3_LIBS}
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

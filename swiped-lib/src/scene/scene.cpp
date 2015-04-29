@@ -20,7 +20,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include <swiped/scene/scene.h>
 
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 
 namespace swiped
 {

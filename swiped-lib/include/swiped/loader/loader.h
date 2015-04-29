@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef SWIPED_LOADER_H
 #define SWIPED_LOADER_H
 
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 
 #include <swiped/swiped.h>
 

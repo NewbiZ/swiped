@@ -69,7 +69,7 @@ public:
     virtual void handle_events()
     {
         // Exit when we press Escape
-        if (glfwGetKey(GLFW_KEY_ESC)==GLFW_PRESS)
+        if (glfwGetKey(swiped::Engine::instance().get_window(), GLFW_KEY_ESCAPE)==GLFW_PRESS)
             engine_.stop();
     }
 

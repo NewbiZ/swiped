@@ -23,7 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <string>
 
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 
 #define SWIPED_VERSION_API_MAJOR 0
 #define SWIPED_VERSION_API_MINOR 0

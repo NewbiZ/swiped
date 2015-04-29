@@ -23,6 +23,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <swiped/swiped.h>
 
+// Forwards
+struct GLFWwindow;
+
 namespace swiped
 {
 
@@ -47,12 +50,16 @@ public:
 public:
     void set_scene(Scene* scene);
 
+public:
+    GLFWwindow* get_window() const;
+
 private:
     Engine();
     ~Engine();
 
 private:
     bool running_;
+    GLFWwindow* window_;
     Scene* scene_;
     Scene* pending_scene_;
 };
