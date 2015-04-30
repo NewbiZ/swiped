@@ -52,6 +52,8 @@ public:
 
 public:
     GLFWwindow* get_window() const;
+    unsigned int get_width() const;
+    unsigned int get_height() const;
 
 private:
     Engine();
@@ -62,6 +64,8 @@ private:
     GLFWwindow* window_;
     Scene* scene_;
     Scene* pending_scene_;
+    unsigned int width_;
+    unsigned int height_;
 };
 
 } // end of namespace swiped

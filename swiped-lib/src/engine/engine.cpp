@@ -91,6 +91,16 @@ GLFWwindow* Engine::get_window() const
   return window_;
 }
 
+unsigned int Engine::get_width() const
+{
+  return width_;
+}
+
+unsigned int Engine::get_height() const
+{
+  return height_;
+}
+
 void Engine::stop()
 {
     running_ = false;
@@ -99,7 +109,9 @@ void Engine::stop()
 Engine::Engine()
   : running_(false),
     scene_(0),
-    pending_scene_(0)
+    pending_scene_(0),
+    width_(1024),
+    height_(768)
 {
     int err = 0;
     
@@ -116,8 +128,8 @@ Engine::Engine()
     // plain old segfault
     
     // Create Window and context
-    window_ = glfwCreateWindow(1024,     // width
-                               768,      // height
+    window_ = glfwCreateWindow(width_,   // width
+                               height_,  // height
                                "Swiped", // Title
                                NULL,     // Monitor (NULL = windowed)
                                NULL);    // Shared context
