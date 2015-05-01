@@ -5,7 +5,9 @@ This project contains a wonderful free game called Swiped.
 Dependencies
 ------------
 In order to build swiped, you will need:
-- libglfw 3.x (glfw.org)
+- GLFW 3.x (glfw.org)
+- OpenAL (openal.org)
+- ALUT ()
 
 Authors
 -------

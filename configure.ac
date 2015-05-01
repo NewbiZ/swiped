@@ -51,7 +51,9 @@ AM_PROG_CC_C_O
 ################################################################################
 #  Check dependencies                                                          #
 ################################################################################
-PKG_CHECK_MODULES([glfw3], [glfw3])
+PKG_CHECK_MODULES([glfw3], [glfw3 >= 3])
+PKG_CHECK_MODULES([openal], [openal])
+PKG_CHECK_MODULES([freealut], [freealut])
 
 ################################################################################
 #  Finish the configuration phase                                              #

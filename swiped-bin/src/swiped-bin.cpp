@@ -20,6 +20,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include <iostream>
 #include <cstdlib>
+#include <cassert>
+#include <cstring>
+
+#include <AL/al.h>
+#include <AL/alut.h>
 
 #include <swiped/swiped.h>
 #include <swiped/engine/engine.h>
@@ -64,13 +69,179 @@ void menu_key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int ac
     {
         *current_menu += 1;
         *current_menu %= 4;
+        alSourcePlay(1);
     }
     else if (key==GLFW_KEY_UP && action==GLFW_PRESS)
     {
         *current_menu -= 1;
         *current_menu %= 4;
+        alSourcePlay(1);
     }
 }
+
+class ChessboardEffect
+{
+public:
+    ChessboardEffect()
+    {
+    }
+
+    ~ChessboardEffect()
+    {
+    }
+
+private: // Non copyable
+    ChessboardEffect(const ChessboardEffect&);
+    ChessboardEffect& operator=(const ChessboardEffect&);
+
+public:
+    void setup(unsigned int width,
+               unsigned int height,
+               unsigned int rows,
+               unsigned int columns,
+               unsigned int spacing,
+               unsigned int count,
+               float color_r_from,
+               float color_g_from,
+               float color_b_from,
+               float color_r_to,
+               float color_g_to,
+               float color_b_to)
+    {
+        width_  = width;
+        height_ = height;
+        rows_    = rows;
+        columns_ = columns;
+        spacing_ = spacing;
+        count_   = count;
+        color_r_from_ = color_r_from;
+        color_g_from_ = color_g_from;
+        color_b_from_ = color_b_from;
+        color_r_to_ = color_r_to;
+        color_g_to_ = color_g_to;
+        color_b_to_ = color_b_to;
+
+        buffer_ = new float[rows_ * columns_];
+        bufferVelocity_ = new float[rows_ * columns_];
+        for (unsigned int i=0; i<rows_*columns_; ++i)
+        {
+            buffer_[i] = 0;
+            bufferVelocity_[i] = 0;
+        }
+
+        while (count--)
+        {
+            unsigned int x = rand() % columns_;
+            unsigned int y = rand() % rows_;
+            vat(x, y) = 0.001;
+            at(x, y) = rand() / (float)RAND_MAX;
+        }
+    }
+
+    void cleanup()
+    {
+        delete [] buffer_;
+        delete [] bufferVelocity_;
+    }
+
+    void update()
+    {
+        // Count currently moving points
+        unsigned int count = 0;
+        for (unsigned int i=0; i<rows_*columns_; ++i)
+        {
+            if (bufferVelocity_[i] != 0)
+                ++count;
+        }
+        // Keep up the count of moving points
+        while (count < count_)
+        {
+            unsigned int x = rand() % columns_;
+            unsigned int y = rand() % rows_;
+            vat(x, y) = 0.001;
+            ++count;
+        }
+        // Move the points
+        for (unsigned int i=0; i<rows_*columns_; ++i)
+        {
+            buffer_[i] += bufferVelocity_[i];
+            if (buffer_[i]>=1.0)
+                bufferVelocity_[i] = -0.001;
+        }
+        // Reset moved points
+        for (unsigned int i=0; i<rows_*columns_; ++i)
+        {
+            if (buffer_[i]<=0 && bufferVelocity_[i]<0)
+            {
+                bufferVelocity_[i] = 0;
+                buffer_[i] = 0;
+            }
+        }
+    }
+
+    void render()
+    {
+        glDisable(GL_BLEND);
+        for (unsigned int x=0; x<columns_; ++x)
+        {
+            for (unsigned int y=0; y<rows_; ++y)
+            {
+                if (at(x, y)!=0)
+                {
+                    float r = (float)color_r_from_ + (float)(color_r_to_ - color_r_from_)*(float)at(x,y);
+                    float g = (float)color_g_from_ + (float)(color_g_to_ - color_g_from_)*(float)at(x,y);
+                    float b = (float)color_b_from_ + (float)(color_b_to_ - color_b_from_)*(float)at(x,y);
+                    glColor3f(r, g, b);
+                    glBegin(GL_QUADS);
+                        glVertex2i(width_/columns_ * x, height_/rows_ * y);
+                        glVertex2i(width_/columns_ * x + width_/columns_, height_/rows_ * y);
+                        glVertex2i(width_/columns_ * x + width_/columns_, height_/rows_ * y + height_/rows_);
+                        glVertex2i(width_/columns_ * x, height_/rows_ * y + height_/rows_);
+                    glEnd();
+                }
+            }
+        }
+        glColor3f(1., 1., 1.);
+        glEnable(GL_BLEND);
+    }
+
+    float& at(unsigned int x, unsigned int y)
+    {
+      return buffer_[y * columns_ + x];
+    }
+
+    const float& at(unsigned int x, unsigned int y) const
+    {
+      return buffer_[y * columns_ + x];
+    }
+
+    float& vat(unsigned int x, unsigned int y)
+    {
+      return bufferVelocity_[y * columns_ + x];
+    }
+
+    const float& vat(unsigned int x, unsigned int y) const
+    {
+      return bufferVelocity_[y * columns_ + x];
+    }
+
+private:
+    unsigned int width_;
+    unsigned int height_;
+    unsigned int rows_;
+    unsigned int columns_;
+    unsigned int spacing_;
+    unsigned int count_;
+    float color_r_from_;
+    float color_g_from_;
+    float color_b_from_;
+    float color_r_to_;
+    float color_g_to_;
+    float color_b_to_;
+
+    float* buffer_;
+    float* bufferVelocity_;
+};
 
 class MenuScene : public swiped::Scene
 {
@@ -108,15 +279,46 @@ public:
         glMatrixMode(GL_MODELVIEW);
 
         text_title   = load_texture("install/bin/data/text_title.tga");
-        text_play    = load_texture("install/bin/data/text_play.tga");
-        text_options = load_texture("install/bin/data/text_options.tga");
-        text_credits = load_texture("install/bin/data/text_credits.tga");
-        text_quit    = load_texture("install/bin/data/text_quit.tga");
+        text_play    = load_texture("install/bin/data/text_play_border.tga");
+        text_options = load_texture("install/bin/data/text_options_border.tga");
+        text_credits = load_texture("install/bin/data/text_credits_border.tga");
+        text_quit    = load_texture("install/bin/data/text_quit_border.tga");
 
         current_menu_ = 0;
 
         current_menu = &current_menu_;
         glfwSetKeyCallback(swiped::Engine::instance().get_window(), menu_key_callback);
+
+        alutInit(0, NULL);
+
+        ALuint source;
+        ALuint source2;
+
+        alGenSources(1, &source);
+        alGenSources(1, &source2);
+
+        ALuint buffer = alutCreateBufferFromFile("install/bin/data/snd_menu.wav");
+        ALuint buffer2 = alutCreateBufferFromFile("install/bin/data/snd_background.wav");
+
+        alSourcei(source, AL_BUFFER, buffer);
+        alSourcei(source2, AL_BUFFER, buffer2);
+
+        snd_menu_ = source;
+
+        alSourcePlay(2);
+
+        effect_chessboard_.setup(1024,
+                                 768,
+                                 20,
+                                 20,
+                                 0,
+                                 50,
+                                 0.25,
+                                 0.50,
+                                 0.75,
+                                 0.35,
+                                 0.65,
+                                 0.85);
 
         return true;
     }
@@ -128,6 +330,8 @@ public:
         glDeleteTextures(1, &text_options);
         glDeleteTextures(1, &text_credits);
         glDeleteTextures(1, &text_quit);
+
+        effect_chessboard_.cleanup();
 
         return true;
     }
@@ -142,11 +346,14 @@ public:
 
     virtual void update(double /*time_delta*/)
     {
+        effect_chessboard_.update();
     }
 
     virtual void render()
     {
         glClear(GL_COLOR_BUFFER_BIT);
+
+        effect_chessboard_.render();
 
         unsigned int title_width  = 512;
         unsigned int title_height = 128;
@@ -333,8 +540,13 @@ private:
     GLuint text_credits;
     GLuint text_quit;
 
+    // Sounds
+    ALuint snd_menu_;
+
     // Menu
     unsigned int current_menu_;
+
+    ChessboardEffect effect_chessboard_;
 };
 
 int main(int /*argc*/, char** /*argv*/)

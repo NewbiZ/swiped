@@ -46,10 +46,14 @@ swiped_bin_SOURCES = \
 swiped_bin_LDADD = \
 	$(top_builddir)/swiped-lib/libswiped.la \
 	${glfw3_LIBS} \
+	${openal_LIBS} \
+	${freealut_LIBS} \
 	-lGL
 
 swiped_bin_CFLAGS = \
-	${glfw3_CFLAGS}
+	${glfw3_CFLAGS} \
+	${openal_CFLAGS} \
+	${freealut_CFLAGS}
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
