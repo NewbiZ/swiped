@@ -50,6 +50,10 @@ void Scene::handle_events()
 {
 }
 
+void Scene::key_pressed(int /*key*/, int /*action*/)
+{
+}
+
 void Scene::update(double /*time_delta*/)
 {
 }

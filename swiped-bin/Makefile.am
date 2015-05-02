@@ -35,13 +35,17 @@ AM_CXXFLAGS = \
 	-Wl,--discard-all \
 	-g \
 	-rdynamic \
-	-I$(top_srcdir)/swiped-lib/include
+	-I$(top_srcdir)/swiped-lib/include \
+	-I$(top_srcdir)/swiped-bin/include
 
 bin_PROGRAMS = \
 	swiped-bin
 
 swiped_bin_SOURCES = \
-	$(top_srcdir)/swiped-bin/src/swiped-bin.cpp
+	$(top_srcdir)/swiped-bin/src/swiped-bin.cpp \
+	$(top_srcdir)/swiped-bin/src/scene/menu.cpp \
+	$(top_srcdir)/swiped-bin/src/scene/game.cpp \
+	$(top_srcdir)/swiped-bin/src/scene/notimplemented.cpp
 
 swiped_bin_LDADD = \
 	$(top_builddir)/swiped-lib/libswiped.la \

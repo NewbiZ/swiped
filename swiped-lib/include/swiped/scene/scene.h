@@ -65,6 +65,12 @@ public:
     virtual void handle_events();
 
     /*
+     * Active key event handling. This will be called every time a key event
+     * is triggered.
+     */
+    virtual void key_pressed(int key, int action);
+
+    /*
      * Allow you to compute all the data needed to render the Scene
      * The time_delta parameter is the number of seconds since the
      * previous call to update()

@@ -18,58 +18,25 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef SWIPED_ENGINE_H
-#define SWIPED_ENGINE_H
-
 #include <swiped/swiped.h>
+#include <swiped/scene/scene.h>
+#include <swiped/engine/static_text.h>
 
-// Forwards
-struct GLFWwindow;
-
-namespace swiped
-{
-
-class Scene;
-
-/*
- * This is the main entry point of the game. The Engine class
- * manages the windowing subsystem along with the setup of the
- * event loop.
- * This class is a singleton, if you whish to use it, just use
- * the instance() method.
- */
-class SWIPED_EXPORT Engine
+class NotImplementedScene : public swiped::Scene
 {
 public:
-    static Engine& instance();
+    NotImplementedScene(swiped::Engine& engine);
 
 public:
-    void start();
-    void stop();
+    virtual bool setup();
+    virtual bool cleanup();
 
-public:
-    void set_scene(Scene* scene);
-    Scene* get_scene() const;
+    virtual void key_pressed(int key, int action);
+    virtual void update(double /*time_delta*/);
 
-public:
-    GLFWwindow* get_window() const;
-    unsigned int get_width() const;
-    unsigned int get_height() const;
+    virtual void render();
 
 private:
-    Engine();
-    ~Engine();
-
-private:
-    bool running_;
-    GLFWwindow* window_;
-    Scene* scene_;
-    Scene* pending_scene_;
-    unsigned int width_;
-    unsigned int height_;
+    swiped::StaticText text_;
 };
-
-} // end of namespace swiped
-
-#endif // SWIPED_ENGINE_H
 

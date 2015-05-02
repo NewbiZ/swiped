@@ -1,0 +1,1 @@
+let g:syntastic_cpp_include_dirs = ['swiped-bin/include', 'swiped-lib/include']

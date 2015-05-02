@@ -25,6 +25,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <swiped/scene/scene.h>
 
+namespace
+{
+
+void key_callback(GLFWwindow* /*window*/,
+                  int key,
+                  int /*scancode*/,
+                  int action,
+                  int /*mods*/)
+{
+    swiped::Scene* scene = swiped::Engine::instance().get_scene();
+    scene->key_pressed(key, action);
+}
+
+} // end of namespace anonymous
+
 namespace swiped
 {
 
@@ -48,12 +63,15 @@ void Engine::start()
         {
             if (scene_)
             {
+                glfwSetKeyCallback(window_, NULL);
                 scene_->cleanup();
                 delete scene_;
             }
             pending_scene_->setup();
 
             scene_ = pending_scene_;
+            glfwSetKeyCallback(window_, key_callback);
+
             pending_scene_ = 0;
         }
 
@@ -65,12 +83,13 @@ void Engine::start()
         scene_->handle_events();
         scene_->update(time_delta);
         scene_->render();
-        
+
         glfwSwapBuffers(window_);
     }
 
     if (scene_)
     {
+        glfwSetKeyCallback(window_, NULL);
         scene_->cleanup();
         delete scene_;
     }
@@ -84,6 +103,11 @@ void Engine::start()
 void Engine::set_scene(Scene* scene)
 {
     pending_scene_ = scene;
+}
+
+Scene* Engine::get_scene() const
+{
+  return scene_;
 }
 
 GLFWwindow* Engine::get_window() const
@@ -114,7 +138,7 @@ Engine::Engine()
     height_(768)
 {
     int err = 0;
-    
+
     err = glfwInit();
     assert(err && "error: failed to initialize glfw");
 
@@ -126,7 +150,7 @@ Engine::Engine()
     // Warning: do not issue any GL call before the context 
     // is created in glfwOpenWindow! This would result in a
     // plain old segfault
-    
+
     // Create Window and context
     window_ = glfwCreateWindow(width_,   // width
                                height_,  // height
